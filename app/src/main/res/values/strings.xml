@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Catering</string>
+    <string name="title_commandes">Commandes</string>
+    <string name="title_paiement">Paiement</string>
+    <string name="title_calendrier">Calendrier</string>
+    <string name="title_profil">Profil</string>
+</resources>
