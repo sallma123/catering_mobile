@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.test1.MainActivity;
 import com.example.test1.R;
 import com.example.test1.api.ApiService;
+import com.example.test1.ui.register.RegisterActivity; // ✅ à importer
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,13 +24,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText editEmail, editPassword;
-    private Button btnLogin;
+    private Button btnLogin, btnRegister; // ✅ ajout du bouton
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 🔐 Redirection si déjà connecté
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String savedEmail = prefs.getString("email", null);
         if (savedEmail != null) {
@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Masquer la toolbar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
@@ -48,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         editEmail = findViewById(R.id.editEmail);
         editPassword = findViewById(R.id.editPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnRegister = findViewById(R.id.btnRegister); // ✅ lié au bouton dans layout
 
         btnLogin.setOnClickListener(v -> {
             String email = editEmail.getText().toString().trim();
@@ -58,21 +58,18 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // ⚙️ Configuration Retrofit
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/") // localhost pour émulateur Android
+                    .baseUrl("http://10.0.2.2:8080/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
             ApiService apiService = retrofit.create(ApiService.class);
             LoginRequest request = new LoginRequest(email, password);
 
-            // 📡 Appel à l'API
             apiService.loginUser(request).enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        // ✅ Connexion réussie → enregistrer et rediriger
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("email", response.body().getEmail());
                         editor.apply();
@@ -80,7 +77,6 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     } else if (response.code() == 401) {
-                        // ❌ Erreur 401 → mauvais identifiants
                         Toast.makeText(LoginActivity.this, "Email ou mot de passe incorrect", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(LoginActivity.this, "Erreur serveur : " + response.code(), Toast.LENGTH_LONG).show();
@@ -92,6 +88,12 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Erreur réseau : " + t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
+        });
+
+        // ✅ Redirection vers l’écran d’inscription
+        btnRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 }
