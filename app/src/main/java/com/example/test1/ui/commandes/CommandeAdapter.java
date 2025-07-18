@@ -10,56 +10,86 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.test1.R;
 import com.example.test1.model.Commande;
+import com.example.test1.model.CommandeItem;
 
 import java.util.List;
 
-public class CommandeAdapter extends RecyclerView.Adapter<CommandeAdapter.CommandeViewHolder> {
+public class CommandeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Commande> commandes;
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_COMMANDE = 1;
 
-    public CommandeAdapter(List<Commande> commandes) {
-        this.commandes = commandes;
+    private List<CommandeItem> items;
+
+    public CommandeAdapter(List<CommandeItem> items) {
+        this.items = items;
     }
 
-    public void setCommandes(List<Commande> commandes) {
-        this.commandes = commandes;
+    public void setItems(List<CommandeItem> items) {
+        this.items = items;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (items.get(position).getType() == CommandeItem.Type.HEADER) {
+            return TYPE_HEADER;
+        } else {
+            return TYPE_COMMANDE;
+        }
     }
 
     @NonNull
     @Override
-    public CommandeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View vue = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_commande, parent, false);
-        return new CommandeViewHolder(vue);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TYPE_HEADER) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_mois, parent, false);
+            return new HeaderViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_commande, parent, false);
+            return new CommandeViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CommandeViewHolder holder, int position) {
-        Commande commande = commandes.get(position);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        CommandeItem item = items.get(position);
 
-        holder.tvTypeCommande.setText(commande.getTypeCommande());
+        if (holder instanceof HeaderViewHolder) {
+            ((HeaderViewHolder) holder).tvMois.setText(item.getMois());
+        } else if (holder instanceof CommandeViewHolder) {
+            Commande commande = item.getCommande();
+            ((CommandeViewHolder) holder).tvTypeCommande.setText(commande.getTypeCommande());
 
-        String details = commande.getNomClient() + " | " + commande.getSalle()
-                + " | " + commande.getNombreTables() + " tables";
-        holder.tvDetailsCommande.setText(details);
+            String details = commande.getNomClient() + " | " + commande.getSalle()
+                    + " | " + commande.getNombreTables() + " tables";
+            ((CommandeViewHolder) holder).tvDetailsCommande.setText(details);
 
-        // Format de date : "2025-08-27" → "27/08"
-        if (commande.getDate() != null && commande.getDate().contains("-")) {
-            String[] dateParts = commande.getDate().split("-");
-            if (dateParts.length == 3) {
-                String shortDate = dateParts[2] + "/" + dateParts[1];
-                holder.tvDateCommande.setText(shortDate);
+            if (commande.getDate() != null && commande.getDate().contains("-")) {
+                String[] dateParts = commande.getDate().split("-");
+                if (dateParts.length == 3) {
+                    String shortDate = dateParts[2] + "/" + dateParts[1];
+                    ((CommandeViewHolder) holder).tvDateCommande.setText(shortDate);
+                }
             }
         }
     }
 
     @Override
     public int getItemCount() {
-        return (commandes != null) ? commandes.size() : 0;
+        return (items != null) ? items.size() : 0;
+    }
+
+    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView tvMois;
+
+        public HeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvMois = itemView.findViewById(R.id.tvMois);
+        }
     }
 
     public static class CommandeViewHolder extends RecyclerView.ViewHolder {
-
         TextView tvTypeCommande, tvDetailsCommande, tvDateCommande;
 
         public CommandeViewHolder(@NonNull View itemView) {

@@ -13,9 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.test1.databinding.FragmentCommandesBinding;
 import com.example.test1.model.Commande;
+import com.example.test1.model.CommandeItem;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class CommandesFragment extends Fragment {
 
@@ -27,27 +31,59 @@ public class CommandesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        // ViewModel
         commandesViewModel = new ViewModelProvider(this).get(CommandesViewModel.class);
-
-        // Binding
         binding = FragmentCommandesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // RecyclerView setup
         binding.rvCommandes.setLayoutManager(new LinearLayoutManager(getContext()));
         commandeAdapter = new CommandeAdapter(new ArrayList<>());
         binding.rvCommandes.setAdapter(commandeAdapter);
 
-        // Observer → LiveData from ViewModel
         commandesViewModel.getCommandes().observe(getViewLifecycleOwner(), new Observer<List<Commande>>() {
             @Override
             public void onChanged(List<Commande> commandes) {
-                commandeAdapter.setCommandes(commandes);
+                List<CommandeItem> items = regrouperParMois(commandes);
+                commandeAdapter.setItems(items);
             }
         });
 
         return root;
+    }
+
+    private List<CommandeItem> regrouperParMois(List<Commande> commandes) {
+        List<CommandeItem> items = new ArrayList<>();
+        HashMap<String, List<Commande>> commandesParMois = new HashMap<>();
+
+        for (Commande commande : commandes) {
+            if (commande.getDate() == null) continue;
+            String[] parts = commande.getDate().split("-");
+            if (parts.length < 2) continue;
+
+            String mois = getNomMois(parts[1]); // "05" → "Mai"
+
+            if (!commandesParMois.containsKey(mois)) {
+                commandesParMois.put(mois, new ArrayList<>());
+            }
+            commandesParMois.get(mois).add(commande);
+        }
+
+        for (String mois : commandesParMois.keySet()) {
+            items.add(new CommandeItem(CommandeItem.Type.HEADER, mois, null));
+            for (Commande c : commandesParMois.get(mois)) {
+                items.add(new CommandeItem(CommandeItem.Type.COMMANDE, null, c));
+            }
+        }
+
+        return items;
+    }
+
+    private String getNomMois(String numeroMois) {
+        try {
+            int moisIndex = Integer.parseInt(numeroMois) - 1;
+            return new DateFormatSymbols(Locale.FRENCH).getMonths()[moisIndex];
+        } catch (Exception e) {
+            return "Inconnu";
+        }
     }
 
     @Override
