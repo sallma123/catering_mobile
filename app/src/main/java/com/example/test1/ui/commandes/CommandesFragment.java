@@ -1,9 +1,11 @@
 package com.example.test1.ui.commandes;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -26,6 +28,7 @@ public class CommandesFragment extends Fragment {
     private FragmentCommandesBinding binding;
     private CommandesViewModel commandesViewModel;
     private CommandeAdapter commandeAdapter;
+    private List<CommandeItem> allItems = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -35,19 +38,84 @@ public class CommandesFragment extends Fragment {
         binding = FragmentCommandesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // RecyclerView
         binding.rvCommandes.setLayoutManager(new LinearLayoutManager(getContext()));
         commandeAdapter = new CommandeAdapter(new ArrayList<>());
         binding.rvCommandes.setAdapter(commandeAdapter);
 
+        // Observer LiveData
         commandesViewModel.getCommandes().observe(getViewLifecycleOwner(), new Observer<List<Commande>>() {
             @Override
             public void onChanged(List<Commande> commandes) {
-                List<CommandeItem> items = regrouperParMois(commandes);
-                commandeAdapter.setItems(items);
+                allItems = regrouperParMois(commandes);
+                commandeAdapter.setItems(allItems);
             }
         });
 
+        // 🔍 SearchView : filtrage dynamique
+        binding.searchViewCommandes.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterCommandes(newText);
+                return true;
+            }
+        });
+
+        // ➕ Actions des 3 boutons
+        binding.btnParticulier.setOnClickListener(v -> ouvrirCreationCommande("Particulier"));
+        binding.btnEntreprise.setOnClickListener(v -> ouvrirCreationCommande("Entreprise"));
+        binding.btnPartenaire.setOnClickListener(v -> ouvrirCreationCommande("Partenaire"));
+
         return root;
+    }
+
+    private void ouvrirCreationCommande(String typeClient) {
+        Intent intent = new Intent(getContext(), CreerCommandeActivity.class);
+        intent.putExtra("typeClient", typeClient);
+        startActivity(intent);
+    }
+
+    private void filterCommandes(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            commandeAdapter.setItems(new ArrayList<>(allItems));
+            return;
+        }
+
+        String searchText = query.toLowerCase().trim();
+        List<CommandeItem> filtered = new ArrayList<>();
+        String currentHeader = null;
+
+        for (CommandeItem item : allItems) {
+            if (item.getType() == CommandeItem.Type.HEADER) {
+                currentHeader = item.getMois();
+            } else if (item.getType() == CommandeItem.Type.COMMANDE) {
+                Commande c = item.getCommande();
+                if (c.getNomClient().toLowerCase().contains(searchText) ||
+                        c.getTypeCommande().toLowerCase().contains(searchText)) {
+
+                    if (!containsHeader(filtered, currentHeader)) {
+                        filtered.add(new CommandeItem(CommandeItem.Type.HEADER, currentHeader, null));
+                    }
+                    filtered.add(item);
+                }
+            }
+        }
+
+        commandeAdapter.setItems(filtered);
+    }
+
+    private boolean containsHeader(List<CommandeItem> list, String mois) {
+        for (CommandeItem item : list) {
+            if (item.getType() == CommandeItem.Type.HEADER && mois.equals(item.getMois())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<CommandeItem> regrouperParMois(List<Commande> commandes) {
@@ -59,12 +127,11 @@ public class CommandesFragment extends Fragment {
             String[] parts = commande.getDate().split("-");
             if (parts.length < 2) continue;
 
-            String mois = getNomMois(parts[1]); // "05" → "Mai"
+            String mois = getNomMois(parts[1]);
 
-            if (!commandesParMois.containsKey(mois)) {
-                commandesParMois.put(mois, new ArrayList<>());
-            }
-            commandesParMois.get(mois).add(commande);
+            commandesParMois
+                    .computeIfAbsent(mois, k -> new ArrayList<>())
+                    .add(commande);
         }
 
         for (String mois : commandesParMois.keySet()) {

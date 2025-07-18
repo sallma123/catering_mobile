@@ -12,6 +12,7 @@ import com.example.test1.R;
 import com.example.test1.model.Commande;
 import com.example.test1.model.CommandeItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -20,13 +21,16 @@ public class CommandeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int TYPE_COMMANDE = 1;
 
     private List<CommandeItem> items;
+    private List<CommandeItem> fullList;  // ✅ Liste originale non filtrée
 
     public CommandeAdapter(List<CommandeItem> items) {
         this.items = items;
+        this.fullList = new ArrayList<>(items);
     }
 
     public void setItems(List<CommandeItem> items) {
         this.items = items;
+        this.fullList = new ArrayList<>(items); // ✅ mettre à jour la source originale
         notifyDataSetChanged();
     }
 
@@ -80,6 +84,7 @@ public class CommandeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return (items != null) ? items.size() : 0;
     }
 
+    // ✅ ViewHolder pour entête (mois)
     public static class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView tvMois;
 
@@ -89,6 +94,7 @@ public class CommandeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    // ✅ ViewHolder pour commande
     public static class CommandeViewHolder extends RecyclerView.ViewHolder {
         TextView tvTypeCommande, tvDetailsCommande, tvDateCommande;
 
@@ -98,5 +104,46 @@ public class CommandeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             tvDetailsCommande = itemView.findViewById(R.id.tvDetailsCommande);
             tvDateCommande = itemView.findViewById(R.id.tvDateCommande);
         }
+    }
+
+    // ✅ Méthode de filtrage dynamique
+    public void filter(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            items = new ArrayList<>(fullList);
+            notifyDataSetChanged();
+            return;
+        }
+
+        query = query.toLowerCase().trim();
+        List<CommandeItem> filtered = new ArrayList<>();
+        String currentHeader = null;
+
+        for (CommandeItem item : fullList) {
+            if (item.getType() == CommandeItem.Type.HEADER) {
+                currentHeader = item.getMois();
+            } else if (item.getType() == CommandeItem.Type.COMMANDE) {
+                Commande c = item.getCommande();
+                if (c.getNomClient().toLowerCase().contains(query)
+                        || c.getTypeCommande().toLowerCase().contains(query)) {
+
+                    if (!containsHeader(filtered, currentHeader)) {
+                        filtered.add(new CommandeItem(CommandeItem.Type.HEADER, currentHeader, null));
+                    }
+                    filtered.add(item);
+                }
+            }
+        }
+
+        this.items = filtered;
+        notifyDataSetChanged();
+    }
+
+    private boolean containsHeader(List<CommandeItem> list, String mois) {
+        for (CommandeItem item : list) {
+            if (item.getType() == CommandeItem.Type.HEADER && mois.equals(item.getMois())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
