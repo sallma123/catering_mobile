@@ -8,6 +8,14 @@ public class ProduitCommande {
     private double prix;
     private boolean selectionne;
 
+    // ✅ Constructeur pratique
+    public ProduitCommande(String nom, String categorie, double prix) {
+        this.nom = nom;
+        this.categorie = categorie;
+        this.prix = prix;
+        this.selectionne = false; // par défaut
+    }
+
     // --- Getters et Setters ---
 
     public Long getId() {
@@ -49,4 +57,9 @@ public class ProduitCommande {
     public void setSelectionne(boolean selectionne) {
         this.selectionne = selectionne;
     }
+    @Override
+    public String toString() {
+        return nom + (prix > 0 ? " - " + prix + " DH" : "");
+    }
+
 }

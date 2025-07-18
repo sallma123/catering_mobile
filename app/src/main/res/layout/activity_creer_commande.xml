@@ -1,20 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
+    android:padding="16dp"
     android:background="@color/white">
 
-    <TextView
-        android:id="@+id/tvTitreTypeClient"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Création : ..."
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:textStyle="bold" />
+        android:orientation="vertical">
 
-    <!-- Tu ajouteras ici le formulaire dynamique plus tard -->
+        <!-- Titre -->
+        <TextView
+            android:id="@+id/tvTitreTypeClient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/titre_creation_commande"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp" />
 
-</LinearLayout>
+        <!-- Type de commande -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/type_commande"
+            android:textColor="@color/black" />
+
+        <Spinner
+            android:id="@+id/spinnerTypeCommande"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Nom du client -->
+        <EditText
+            android:id="@+id/etNomClient"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="@string/hint_nom_client"
+            android:inputType="textPersonName"
+            android:autofillHints="name"
+            android:backgroundTint="@color/gold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Salle -->
+        <EditText
+            android:id="@+id/etSalle"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="@string/hint_salle"
+            android:inputType="text"
+            android:autofillHints="postalAddress"
+            android:backgroundTint="@color/gold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Label dynamique -->
+        <TextView
+            android:id="@+id/tvLabelNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_nombre"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/etNombre"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="@string/hint_nombre"
+            android:inputType="number"
+            android:autofillHints="none"
+            android:backgroundTint="@color/gold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Date -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/date"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/etDate"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="@string/choisir_date"
+            android:focusable="false"
+            android:inputType="none"
+            android:autofillHints="none"
+            android:backgroundTint="@color/gold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Statut -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/statut"
+            android:textColor="@color/black" />
+
+        <Spinner
+            android:id="@+id/spinnerStatut"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Bouton suivant -->
+        <Button
+            android:id="@+id/btnSuivant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/suivant"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/gold"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</ScrollView>

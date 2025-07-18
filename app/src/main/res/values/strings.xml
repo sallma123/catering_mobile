@@ -4,4 +4,15 @@
     <string name="title_paiement">Paiement</string>
     <string name="title_calendrier">Calendrier</string>
     <string name="title_profil">Profil</string>
+    <string name="titre_creation_commande">Création de commande</string>
+    <string name="type_commande">Type de commande</string>
+    <string name="hint_nom_client">Nom du client</string>
+    <string name="hint_salle">Salle</string>
+    <string name="label_nombre">Nombre de tables</string>
+    <string name="hint_nombre">Ex: 5</string>
+    <string name="date">Date</string>
+    <string name="choisir_date">Choisir une date</string>
+    <string name="statut">Statut</string>
+    <string name="suivant">Suivant</string>
+
 </resources>

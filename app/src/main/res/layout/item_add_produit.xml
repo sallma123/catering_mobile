@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="@android:color/white">
+
+    <EditText
+        android:id="@+id/etNouveauProduit"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:hint="Ajouter un produit"
+        android:backgroundTint="@color/gold"
+        android:inputType="text"
+        android:textColor="@android:color/black"
+        android:padding="8dp" />
+
+    <Button
+        android:id="@+id/btnAjouterProduitSection"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="Ajouter"
+        android:textAllCaps="false"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@color/gold"
+        android:textColor="@android:color/white" />
+</LinearLayout>

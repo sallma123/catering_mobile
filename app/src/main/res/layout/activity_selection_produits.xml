@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tvTitreProduits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Produits pour Mariage"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Liste des produits -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvProduits"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Ajout produit personnalisé -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <EditText
+            android:id="@+id/etProduitPerso"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="2"
+            android:hint="Nom produit"
+            android:backgroundTint="@color/gold"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etPrixPerso"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:hint="Prix"
+            android:inputType="numberDecimal"
+            android:backgroundTint="@color/gold"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/btnAjouterProduit"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="+"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/gold"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <!-- Prix par table -->
+    <EditText
+        android:id="@+id/etPrixTable"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Prix par table"
+        android:inputType="numberDecimal"
+        android:backgroundTint="@color/gold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Total -->
+    <TextView
+        android:id="@+id/tvTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total : 0.00 DH"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Bouton Valider -->
+    <Button
+        android:id="@+id/btnValider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Valider"
+        android:backgroundTint="@color/gold"
+        android:textColor="@color/white" />
+</LinearLayout>
