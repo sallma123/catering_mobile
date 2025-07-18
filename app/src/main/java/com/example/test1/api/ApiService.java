@@ -1,11 +1,15 @@
 package com.example.test1.api;
 
+import com.example.test1.model.Commande;
 import com.example.test1.ui.login.LoginRequest;
 import com.example.test1.ui.login.LoginResponse;
 import com.example.test1.ui.register.RegisterRequest;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface ApiService {
@@ -15,4 +19,8 @@ public interface ApiService {
 
     @POST("/api/auth/register")
     Call<Void> registerUser(@Body RegisterRequest registerRequest);
+
+    // ✅ Ajouter cet endpoint pour récupérer les commandes
+    @GET("/api/commandes")
+    Call<List<Commande>> getCommandes();
 }

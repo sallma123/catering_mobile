@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_commandes, R.id.navigation_paiement, R.id.navigation_calendrier,R.id.navigation_profil)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
