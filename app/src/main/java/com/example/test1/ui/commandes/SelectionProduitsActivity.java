@@ -125,9 +125,9 @@ public class SelectionProduitsActivity extends AppCompatActivity {
             commandeDTO.setNomClient(nomClient);
             commandeDTO.setSalle(salle);
             commandeDTO.setDate(date);
-            commandeDTO.setStatut(statut);
-            commandeDTO.setTypeClient(typeClient);
-            commandeDTO.setTypeCommande(typeCommande);
+            commandeDTO.setTypeClient(typeClient.toUpperCase());
+            commandeDTO.setStatut(statut.toUpperCase());
+            commandeDTO.setTypeCommande(typeCommande.toUpperCase().replace(" ", "_"));
             commandeDTO.setNombreTables(nombreTables);
             commandeDTO.setPrixParTable(prixParTable);
             commandeDTO.setProduits(produitsSelectionnes);
