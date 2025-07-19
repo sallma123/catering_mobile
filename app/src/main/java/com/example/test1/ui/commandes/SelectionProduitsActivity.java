@@ -20,14 +20,14 @@ import java.util.List;
 public class SelectionProduitsActivity extends AppCompatActivity {
 
     private TextView tvTitreProduits, tvTotal;
-    private EditText etPrixTable;
-    private Button btnValider;
+    private EditText etPrixTable, etProduitPerso, etPrixPerso;
+    private Button btnValider, btnAjouterProduit;
     private RecyclerView rvProduits;
     private SectionProduitAdapter adapter;
 
     private List<SectionProduit> sections = new ArrayList<>();
     private double prixParTable = 0;
-    private int nombreTables = 5; // À récupérer depuis Intent
+    private int nombreTables = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,10 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         tvTitreProduits = findViewById(R.id.tvTitreProduits);
         tvTotal = findViewById(R.id.tvTotal);
         etPrixTable = findViewById(R.id.etPrixTable);
+        etProduitPerso = findViewById(R.id.etProduitPerso);
+        etPrixPerso = findViewById(R.id.etPrixPerso);
         btnValider = findViewById(R.id.btnValider);
+        btnAjouterProduit = findViewById(R.id.btnAjouterProduit);
         rvProduits = findViewById(R.id.rvProduits);
 
         // Récupération des extras si présents
@@ -67,6 +70,30 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         rvProduits.setLayoutManager(new LinearLayoutManager(this));
         rvProduits.setAdapter(adapter);
 
+        // Ajouter un produit personnalisé indépendant (hors section)
+        btnAjouterProduit.setOnClickListener(v -> {
+            String nom = etProduitPerso.getText().toString().trim();
+            String prixStr = etPrixPerso.getText().toString().trim();
+
+            if (!nom.isEmpty() && !prixStr.isEmpty()) {
+                try {
+                    double prix = Double.parseDouble(prixStr);
+                    ProduitCommande p = new ProduitCommande(nom, "Supplément", prix);
+                    p.setSelectionne(true);
+                    getOrCreateSection("Supplément").getProduits().add(p);
+
+                    adapter = new SectionProduitAdapter(sections, this::recalculerTotal);
+                    rvProduits.setAdapter(adapter);
+
+                    etProduitPerso.setText("");
+                    etPrixPerso.setText("");
+                    recalculerTotal();
+                } catch (NumberFormatException e) {
+                    etPrixPerso.setError("Prix invalide");
+                }
+            }
+        });
+
         etPrixTable.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) recalculerTotal();
         });
@@ -74,6 +101,17 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         btnValider.setOnClickListener(v -> {
             // TODO : générer la fiche PDF ou résumé final
         });
+    }
+
+    private SectionProduit getOrCreateSection(String titre) {
+        for (SectionProduit section : sections) {
+            if (section.getTitre().equalsIgnoreCase(titre)) {
+                return section;
+            }
+        }
+        SectionProduit nouvelle = new SectionProduit(titre, new ArrayList<>());
+        sections.add(nouvelle);
+        return nouvelle;
     }
 
     private void recalculerTotal() {
