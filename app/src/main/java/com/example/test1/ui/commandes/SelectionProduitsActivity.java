@@ -66,6 +66,20 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         adapter = new SectionProduitAdapter(sections, this::recalculerTotal);
         rvProduits.setLayoutManager(new LinearLayoutManager(this));
         rvProduits.setAdapter(adapter);
+        // 🔄 Recalcul automatique du total dès qu'on tape un chiffre dans prix table
+        etPrixTable.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                recalculerTotal(); // 🔁 Met à jour le total dès que ça change
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
 
         etPrixTable.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) recalculerTotal();
