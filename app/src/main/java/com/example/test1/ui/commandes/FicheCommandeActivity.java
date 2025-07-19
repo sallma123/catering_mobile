@@ -8,13 +8,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.example.test1.R;
 import com.example.test1.api.ApiService;
 import com.example.test1.api.RetrofitClient;
-import com.example.test1.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -34,11 +35,11 @@ public class FicheCommandeActivity extends AppCompatActivity {
         commandeId = getIntent().getLongExtra("commandeId", -1);
         apiService = RetrofitClient.getInstance().getApi();
 
-        if (commandeId != -1) {
-            telechargerEtAfficherFiche(commandeId);
-        } else {
-            Toast.makeText(this, "Commande invalide", Toast.LENGTH_SHORT).show();
+        if (commandeId == -1) {
+            Toast.makeText(this, "❌ ID de commande manquant", Toast.LENGTH_LONG).show();
             finish();
+        } else {
+            telechargerEtAfficherFiche(commandeId);
         }
     }
 
@@ -47,20 +48,25 @@ public class FicheCommandeActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    boolean saved = enregistrerFichierPdf(response.body(), "fiche_commande_" + id + ".pdf");
-                    if (saved) {
-                        afficherOptions(id);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Erreur d'enregistrement", Toast.LENGTH_SHORT).show();
-                    }
+                    // ✅ Lire et enregistrer le fichier PDF dans un thread séparé
+                    new Thread(() -> {
+                        boolean saved = enregistrerFichierPdf(response.body(), "fiche_commande_" + id + ".pdf");
+                        runOnUiThread(() -> {
+                            if (saved) {
+                                afficherOptions(id);
+                            } else {
+                                showError("❌ Échec d'enregistrement du PDF");
+                            }
+                        });
+                    }).start();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Erreur de téléchargement", Toast.LENGTH_SHORT).show();
+                    showError("❌ Réponse invalide lors du téléchargement (code " + response.code() + ")");
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();
+                showError("❌ Erreur réseau : " + t.getMessage());
             }
         });
     }
@@ -68,9 +74,16 @@ public class FicheCommandeActivity extends AppCompatActivity {
     private boolean enregistrerFichierPdf(ResponseBody body, String nomFichier) {
         try {
             File pdfFile = new File(getExternalFilesDir(null), nomFichier);
+            InputStream inputStream = body.byteStream();
             FileOutputStream fos = new FileOutputStream(pdfFile);
-            fos.write(body.bytes());
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
+            }
+            fos.flush();
             fos.close();
+            inputStream.close();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +96,7 @@ public class FicheCommandeActivity extends AppCompatActivity {
         Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", pdfFile);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Fiche générée");
+        builder.setTitle("✅ Fiche PDF générée");
         builder.setMessage("Que souhaitez-vous faire ?");
         builder.setPositiveButton("📄 Ouvrir", (dialog, which) -> ouvrirFichierPdf(uri));
         builder.setNegativeButton("📤 Partager", (dialog, which) -> partagerFichierPdf(uri));
@@ -98,7 +111,7 @@ public class FicheCommandeActivity extends AppCompatActivity {
         try {
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(this, "Aucune app pour ouvrir le PDF", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "❌ Aucune application trouvée pour lire les PDF", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -108,5 +121,13 @@ public class FicheCommandeActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(Intent.createChooser(intent, "Partager avec..."));
+    }
+
+    private void showError(String message) {
+        runOnUiThread(() -> new AlertDialog.Builder(this)
+                .setTitle("Erreur")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .show());
     }
 }
