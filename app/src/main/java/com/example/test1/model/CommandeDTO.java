@@ -10,30 +10,80 @@ public class CommandeDTO {
     private String typeClient;
     private String typeCommande;
     private String statut;
+    private String date; // ✅ Nouveau champ ajouté
     private List<ProduitCommande> produits;
 
-    // Getters et Setters
-    public String getNomClient() { return nomClient; }
-    public void setNomClient(String nomClient) { this.nomClient = nomClient; }
+    // --- Getters et Setters ---
 
-    public String getSalle() { return salle; }
-    public void setSalle(String salle) { this.salle = salle; }
+    public String getNomClient() {
+        return nomClient;
+    }
 
-    public int getNombreTables() { return nombreTables; }
-    public void setNombreTables(int nombreTables) { this.nombreTables = nombreTables; }
+    public void setNomClient(String nomClient) {
+        this.nomClient = nomClient;
+    }
 
-    public double getPrixParTable() { return prixParTable; }
-    public void setPrixParTable(double prixParTable) { this.prixParTable = prixParTable; }
+    public String getSalle() {
+        return salle;
+    }
 
-    public String getTypeClient() { return typeClient; }
-    public void setTypeClient(String typeClient) { this.typeClient = typeClient; }
+    public void setSalle(String salle) {
+        this.salle = salle;
+    }
 
-    public String getTypeCommande() { return typeCommande; }
-    public void setTypeCommande(String typeCommande) { this.typeCommande = typeCommande; }
+    public int getNombreTables() {
+        return nombreTables;
+    }
 
-    public String getStatut() { return statut; }
-    public void setStatut(String statut) { this.statut = statut; }
+    public void setNombreTables(int nombreTables) {
+        this.nombreTables = nombreTables;
+    }
 
-    public List<ProduitCommande> getProduits() { return produits; }
-    public void setProduits(List<ProduitCommande> produits) { this.produits = produits; }
+    public double getPrixParTable() {
+        return prixParTable;
+    }
+
+    public void setPrixParTable(double prixParTable) {
+        this.prixParTable = prixParTable;
+    }
+
+    public String getTypeClient() {
+        return typeClient;
+    }
+
+    public void setTypeClient(String typeClient) {
+        this.typeClient = typeClient;
+    }
+
+    public String getTypeCommande() {
+        return typeCommande;
+    }
+
+    public void setTypeCommande(String typeCommande) {
+        this.typeCommande = typeCommande;
+    }
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
+
+    public String getDate() { // ✅ Getter pour date
+        return date;
+    }
+
+    public void setDate(String date) { // ✅ Setter pour date
+        this.date = date;
+    }
+
+    public List<ProduitCommande> getProduits() {
+        return produits;
+    }
+
+    public void setProduits(List<ProduitCommande> produits) {
+        this.produits = produits;
+    }
 }

@@ -15,7 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.test1.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class CreerCommandeActivity extends AppCompatActivity {
 
@@ -71,6 +74,9 @@ public class CreerCommandeActivity extends AppCompatActivity {
         statutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStatut.setAdapter(statutAdapter);
 
+        // Préremplir la date avec aujourd’hui
+        etDate.setText(getTodayInFrFormat());
+
         // Choix de date
         etDate.setOnClickListener(view -> {
             final Calendar calendar = Calendar.getInstance();
@@ -93,11 +99,31 @@ public class CreerCommandeActivity extends AppCompatActivity {
             Intent intent = new Intent(CreerCommandeActivity.this, SelectionProduitsActivity.class);
             intent.putExtra("typeCommande", spinnerTypeCommande.getSelectedItem().toString());
             intent.putExtra("nombre", Integer.parseInt(etNombre.getText().toString().trim()));
+            intent.putExtra("nomClient", etNomClient.getText().toString().trim());
+            intent.putExtra("salle", etSalle.getText().toString().trim());
+            intent.putExtra("date", convertDateToIso(etDate.getText().toString().trim())); // ex: "20/07/2025" → "2025-07-20"
+            intent.putExtra("statut", spinnerStatut.getSelectedItem().toString().equalsIgnoreCase("Payé") ? "PAYEE" : "NON_PAYEE");
+            intent.putExtra("typeClient", typeClient.toUpperCase());
+
             startActivity(intent);
         });
+    }
 
+    // 🔁 Convertir la date dd/MM/yyyy vers yyyy-MM-dd
+    private String convertDateToIso(String dateFr) {
+        try {
+            SimpleDateFormat fr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = fr.parse(dateFr);
+            return iso.format(date);
+        } catch (Exception e) {
+            return "2025-01-01"; // valeur par défaut
+        }
+    }
 
+    // 🔁 Retourne aujourd'hui au format dd/MM/yyyy pour affichage initial
+    private String getTodayInFrFormat() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        return sdf.format(new Date());
     }
 }
-
-

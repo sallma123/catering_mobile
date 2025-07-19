@@ -39,6 +39,8 @@ public class SelectionProduitsActivity extends AppCompatActivity {
     private double prixParTable = 0;
     private int nombreTables = 5;
 
+    private String typeCommande, nomClient, salle, date, statut, typeClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +53,15 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         btnValider = findViewById(R.id.btnValider);
         rvProduits = findViewById(R.id.rvProduits);
 
-        // Récupération des extras
-        String typeCommande = getIntent().getStringExtra("typeCommande");
+        // Récupération des extras de l'écran précédent
+        typeCommande = getIntent().getStringExtra("typeCommande");
+        nomClient = getIntent().getStringExtra("nomClient");
+        salle = getIntent().getStringExtra("salle");
+        date = getIntent().getStringExtra("date");
+        statut = getIntent().getStringExtra("statut");
+        typeClient = getIntent().getStringExtra("typeClient");
         nombreTables = getIntent().getIntExtra("nombre", 1);
+
         tvTitreProduits.setText("Produits pour " + typeCommande);
 
         // Création des sections
@@ -97,7 +105,7 @@ public class SelectionProduitsActivity extends AppCompatActivity {
 
             prixParTable = Double.parseDouble(prixText);
 
-            // 🧩 Liste des produits cochés
+            // Récupération des produits sélectionnés
             List<ProduitCommande> produitsSelectionnes = new ArrayList<>();
             for (SectionProduit section : sections) {
                 for (ProduitCommande produit : section.getProduits()) {
@@ -112,18 +120,19 @@ public class SelectionProduitsActivity extends AppCompatActivity {
                 return;
             }
 
-            // 🧩 Création de l'objet CommandeDTO
+            // Construction de CommandeDTO
             CommandeDTO commandeDTO = new CommandeDTO();
-            commandeDTO.setNomClient("Client Test");
-            commandeDTO.setSalle("Salle Demo");
+            commandeDTO.setNomClient(nomClient);
+            commandeDTO.setSalle(salle);
+            commandeDTO.setDate(date);
+            commandeDTO.setStatut(statut);
+            commandeDTO.setTypeClient(typeClient);
+            commandeDTO.setTypeCommande(typeCommande);
             commandeDTO.setNombreTables(nombreTables);
             commandeDTO.setPrixParTable(prixParTable);
-            commandeDTO.setTypeClient("PARTICULIER");
-            commandeDTO.setTypeCommande(typeCommande);
-            commandeDTO.setStatut("NON_PAYEE");
             commandeDTO.setProduits(produitsSelectionnes);
 
-            // 🚀 Appel Retrofit pour POST /api/commandes
+            // Envoi de la commande au backend
             ApiService apiService = RetrofitClient.getInstance().getApi();
             apiService.creerCommande(commandeDTO).enqueue(new Callback<Commande>() {
                 @Override
