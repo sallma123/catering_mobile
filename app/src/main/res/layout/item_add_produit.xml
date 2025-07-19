@@ -7,17 +7,32 @@
     android:gravity="center_vertical"
     android:background="@android:color/white">
 
+    <!-- Champ : nom du produit -->
     <EditText
         android:id="@+id/etNouveauProduit"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_weight="1"
-        android:hint="Ajouter un produit"
+        android:layout_weight="1.5"
+        android:hint="Nom produit"
         android:backgroundTint="@color/gold"
         android:inputType="text"
         android:textColor="@android:color/black"
         android:padding="8dp" />
 
+    <!-- Champ : prix du produit -->
+    <EditText
+        android:id="@+id/etPrixProduit"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:hint="Prix"
+        android:backgroundTint="@color/gold"
+        android:inputType="numberDecimal"
+        android:textColor="@android:color/black"
+        android:padding="8dp"
+        android:layout_marginStart="8dp" />
+
+    <!-- Bouton : Ajouter -->
     <Button
         android:id="@+id/btnAjouterProduitSection"
         android:layout_width="wrap_content"

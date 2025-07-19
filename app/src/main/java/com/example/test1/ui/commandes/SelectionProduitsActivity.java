@@ -20,8 +20,8 @@ import java.util.List;
 public class SelectionProduitsActivity extends AppCompatActivity {
 
     private TextView tvTitreProduits, tvTotal;
-    private EditText etPrixTable, etProduitPerso, etPrixPerso;
-    private Button btnValider, btnAjouterProduit;
+    private EditText etPrixTable;
+    private Button btnValider;
     private RecyclerView rvProduits;
     private SectionProduitAdapter adapter;
 
@@ -38,10 +38,7 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         tvTitreProduits = findViewById(R.id.tvTitreProduits);
         tvTotal = findViewById(R.id.tvTotal);
         etPrixTable = findViewById(R.id.etPrixTable);
-        etProduitPerso = findViewById(R.id.etProduitPerso);
-        etPrixPerso = findViewById(R.id.etPrixPerso);
         btnValider = findViewById(R.id.btnValider);
-        btnAjouterProduit = findViewById(R.id.btnAjouterProduit);
         rvProduits = findViewById(R.id.rvProduits);
 
         // Récupération des extras si présents
@@ -69,30 +66,6 @@ public class SelectionProduitsActivity extends AppCompatActivity {
         adapter = new SectionProduitAdapter(sections, this::recalculerTotal);
         rvProduits.setLayoutManager(new LinearLayoutManager(this));
         rvProduits.setAdapter(adapter);
-
-        // Ajouter un produit personnalisé indépendant (hors section)
-        btnAjouterProduit.setOnClickListener(v -> {
-            String nom = etProduitPerso.getText().toString().trim();
-            String prixStr = etPrixPerso.getText().toString().trim();
-
-            if (!nom.isEmpty() && !prixStr.isEmpty()) {
-                try {
-                    double prix = Double.parseDouble(prixStr);
-                    ProduitCommande p = new ProduitCommande(nom, "Supplément", prix);
-                    p.setSelectionne(true);
-                    getOrCreateSection("Supplément").getProduits().add(p);
-
-                    adapter = new SectionProduitAdapter(sections, this::recalculerTotal);
-                    rvProduits.setAdapter(adapter);
-
-                    etProduitPerso.setText("");
-                    etPrixPerso.setText("");
-                    recalculerTotal();
-                } catch (NumberFormatException e) {
-                    etPrixPerso.setError("Prix invalide");
-                }
-            }
-        });
 
         etPrixTable.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) recalculerTotal();

@@ -67,29 +67,57 @@ public class SectionProduitAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             String titre = (String) item;
             ((SectionHeaderViewHolder) holder).tvSectionTitle.setText(titre);
             ((SectionHeaderViewHolder) holder).cbTout.setOnClickListener(v -> toggleSection(titre, ((SectionHeaderViewHolder) holder).cbTout.isChecked()));
+
         } else if (holder instanceof ProduitViewHolder) {
             ProduitCommande p = (ProduitCommande) item;
             ((ProduitViewHolder) holder).tvNom.setText(p.getNom());
-            ((ProduitViewHolder) holder).tvPrix.setVisibility(p.getPrix() > 0 ? View.VISIBLE : View.GONE);
-            ((ProduitViewHolder) holder).tvPrix.setText(String.format("%.2f DH", p.getPrix()));
+
+            if (p.getPrix() > 0) {
+                ((ProduitViewHolder) holder).tvPrix.setText(String.format("%.2f DH", p.getPrix()));
+                ((ProduitViewHolder) holder).tvPrix.setVisibility(View.VISIBLE);
+            } else {
+                ((ProduitViewHolder) holder).tvPrix.setVisibility(View.GONE);
+            }
+
             ((ProduitViewHolder) holder).cbProduit.setOnCheckedChangeListener(null);
             ((ProduitViewHolder) holder).cbProduit.setChecked(p.isSelectionne());
             ((ProduitViewHolder) holder).cbProduit.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 p.setSelectionne(isChecked);
                 onSelectionChanged.run();
             });
+
         } else if (holder instanceof AddProduitViewHolder) {
             AddProduitInput addInput = (AddProduitInput) item;
+
+            if (!"Supplément".equalsIgnoreCase(addInput.section.getTitre())) {
+                ((AddProduitViewHolder) holder).etPrix.setVisibility(View.GONE);
+            } else {
+                ((AddProduitViewHolder) holder).etPrix.setVisibility(View.VISIBLE);
+            }
+
             ((AddProduitViewHolder) holder).btnAjouter.setOnClickListener(v -> {
                 String nom = ((AddProduitViewHolder) holder).etNouveau.getText().toString().trim();
+                String prixStr = ((AddProduitViewHolder) holder).etPrix.getText().toString().trim();
+
                 if (!nom.isEmpty()) {
-                    ProduitCommande p = new ProduitCommande(nom, addInput.section.getTitre(), 0);
+                    double prix = 0;
+                    if (addInput.section.getTitre().equalsIgnoreCase("Supplément")) {
+                        try {
+                            prix = Double.parseDouble(prixStr);
+                        } catch (NumberFormatException ignored) {}
+                    }
+
+                    ProduitCommande p = new ProduitCommande(nom, addInput.section.getTitre(), prix);
                     p.setSelectionne(true);
                     addInput.section.getProduits().add(p);
-                    int index = displayItems.indexOf(item);
-                    displayItems.add(index, p);
+
+                    int insertPosition = displayItems.indexOf(item);
+                    displayItems.add(insertPosition, p);
                     notifyDataSetChanged();
                     onSelectionChanged.run();
+
+                    ((AddProduitViewHolder) holder).etNouveau.setText("");
+                    ((AddProduitViewHolder) holder).etPrix.setText("");
                 }
             });
         }
@@ -137,12 +165,13 @@ public class SectionProduitAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public static class AddProduitViewHolder extends RecyclerView.ViewHolder {
-        EditText etNouveau;
+        EditText etNouveau, etPrix;
         Button btnAjouter;
 
         public AddProduitViewHolder(@NonNull View itemView) {
             super(itemView);
             etNouveau = itemView.findViewById(R.id.etNouveauProduit);
+            etPrix = itemView.findViewById(R.id.etPrixProduit);
             btnAjouter = itemView.findViewById(R.id.btnAjouterProduitSection);
         }
     }
