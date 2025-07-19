@@ -119,6 +119,7 @@ public class CommandesFragment extends Fragment {
     }
 
     private List<CommandeItem> regrouperParMois(List<Commande> commandes) {
+        if (commandes == null) commandes = new ArrayList<>();
         List<CommandeItem> items = new ArrayList<>();
         HashMap<String, List<Commande>> commandesParMois = new HashMap<>();
 
@@ -158,4 +159,5 @@ public class CommandesFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }
